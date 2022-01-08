@@ -8,14 +8,10 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-from discordwebhook import Discord
-
 
 
 userID = ""
 webhookURL = ""
-
-discord = Discord(url=webhookURL)
 
 def grab_html(url):
     headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
@@ -46,13 +42,14 @@ def check(url, site):
 
     # In stock
     if check_item_in_stock(page_html, site):
-        msg = "<@!" + userID + "> this is in stock now! [Link here](" + url + ")"
-        discord.post(content=msg)
+        in_stock = "<@!" + userID + "> this is in stock now! [Link here](" + url + ")"
+        msg = {"content": in_stock}
+        requests.post(webhookURL, data=msg)
     
     # Out of stock
     else:
-        msg = site + " out of stock."
-        print(msg)
+        oos = site + " out of stock."
+        print(oos)
 
 
 def main():

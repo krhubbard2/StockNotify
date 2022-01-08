@@ -3,7 +3,7 @@
 # Started: 2022-01-06
 # Updated: 2022-01-07
 
-# Notify a user on Discord of potential PS5 in stock using Discord webhook and html parsing. Currently works with Bestbuy & Playstation direct.
+# Notify a user via Discord, email, or sms text of potential PS5 in stock using Discord webhook, html parsing and smtplib. Currently works with Bestbuy & Playstation direct.
 
 import requests
 from bs4 import BeautifulSoup

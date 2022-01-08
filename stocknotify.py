@@ -8,10 +8,24 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import smtplib, ssl
 
-
+port = 465 # For SSL
+smtp_server = "smtp.gmail.com"
+password = input("Gmail Sender Password: ")
+sender_email = ""
+receiver_email = ""
 userID = ""
 webhookURL = ""
+
+# Enable / Disable notifications
+discord_notification = True
+email_notification = True
+
+# Email spam limiter
+emailLimit = 5 # Max emails it will notify you before stopping email notification
+emailCounter = 0 # Do not change
+
 
 def grab_html(url):
     headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
@@ -42,10 +56,25 @@ def check(url, site):
 
     # In stock
     if check_item_in_stock(page_html, site):
-        in_stock = "<@!" + userID + "> this is in stock now! [Link here](" + url + ")"
-        msg = {"content": in_stock}
-        requests.post(webhookURL, data=msg)
     
+        # Discord Notification
+        if (discord_notification == True):
+            in_stock = "<@!" + userID + "> This is in stock now! [Link here](" + url + "). Also sending you an email now."
+            msg = {"content": in_stock}
+            requests.post(webhookURL, data=msg) 
+
+        # Email Notification
+        if (email_notification == True and emailCounter <= emailLimit):
+            msg = """\
+            Subject: StockNotify
+
+            PS5 In Stock Now! """ + url
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(sender_email, password)
+                server.sendmail(sender_email, receiver_email, msg)
+            emailCounter += 1
+
     # Out of stock
     else:
         oos = site + " out of stock."

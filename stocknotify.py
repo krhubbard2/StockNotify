@@ -17,7 +17,7 @@ smtp_server = "smtp.gmail.com"  # Assuming your sender email is Gmail
 password = input("Gmail Sender Password: ")
 sender_email = "" # If not gmail -- change smtp_server
 receiver_email = "" # Any valid email
-receiver_text = "PHONENUMBER@txt.att.net"  # Assumign ATT is cell service provider
+receiver_text = "PHONENUMBER@txt.att.net"  # Assuming ATT is cell service provider
 userID = "" # Discord userID
 webhookURL = "" # Discord webhookURL
 

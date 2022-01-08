@@ -8,25 +8,29 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-import smtplib, ssl
+import smtplib, ssl # For email notification
+from email.mime.text import MIMEText # For txt notifcation
+from email.mime.multipart import MIMEMultipart
 
 port = 465 # For SSL
-smtp_server = "smtp.gmail.com"
+smtp_server = "smtp.gmail.com"  # Assuming your sender email is Gmail
 password = input("Gmail Sender Password: ")
-sender_email = ""
-receiver_email = ""
-userID = ""
-webhookURL = ""
+sender_email = "" # If not gmail -- change smtp_server
+receiver_email = "" # Any valid email
+receiver_text = "PHONENUMBER@txt.att.net"  # Assumign ATT is cell service provider
+userID = "" # Discord userID
+webhookURL = "" # Discord webhookURL
 
 # Enable / Disable notifications
-discord_notification = True
+discord_notification = False
 email_notification = True
+text_notification = True
 
 # Email spam limiter
-emailLimit = 5 # Max emails it will notify you before stopping email notification
-emailCounter = 0 # Do not change
+spamLimit = 5 # Max emails & texts it will notify you before stopping notification
+spamCounter = 0
 
-
+# Grabs html from URL
 def grab_html(url):
     headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
     page = requests.get(url, headers=headers)
@@ -52,11 +56,12 @@ def check_item_in_stock(page_html, site):
     return len(out_of_stock_divs) == 0
 
 def check(url, site):
+    global spamLimit
+    global spamCounter
     page_html = grab_html(url)
 
     # In stock
     if check_item_in_stock(page_html, site):
-    
         # Discord Notification
         if (discord_notification == True):
             in_stock = "<@!" + userID + "> This is in stock now! [Link here](" + url + "). Also sending you an email now."
@@ -64,7 +69,7 @@ def check(url, site):
             requests.post(webhookURL, data=msg) 
 
         # Email Notification
-        if (email_notification == True and emailCounter <= emailLimit):
+        if (email_notification == True and spamCounter <= spamLimit):
             msg = """\
             Subject: StockNotify
 
@@ -73,9 +78,26 @@ def check(url, site):
             with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
                 server.login(sender_email, password)
                 server.sendmail(sender_email, receiver_email, msg)
-            emailCounter += 1
+            spamCounter += 1
 
-    # Out of stock
+        # Text Notification
+        if (text_notification == True and spamCounter <= spamLimit):
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = receiver_text
+            msg['Subject'] = "StockNotify\n"
+            body = "PS5 In Stock Now! " + url
+            msg.attach(MIMEText(body, 'plain'))
+
+            sms = msg.as_string()
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(sender_email, password)
+                server.sendmail(sender_email, receiver_text, sms)
+            spamCounter += 1
+
+    # Out of stock (prints to terminal)
     else:
         oos = site + " out of stock."
         print(oos)

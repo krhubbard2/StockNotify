@@ -23,8 +23,9 @@ webhookURL = "" # Discord webhookURL
 
 # Enable / Disable notifications
 discord_notification = False
-email_notification = True
-text_notification = True
+email_notification = False
+text_notification = False
+console_notification = True
 
 # Email spam limiter
 spamLimit = 5 # Max emails & texts it will notify you before stopping notification
@@ -64,7 +65,7 @@ def check(url, site):
     if check_item_in_stock(page_html, site):
         # Discord Notification
         if (discord_notification == True):
-            in_stock = "<@!" + userID + "> This is in stock now! [Link here](" + url + "). Also sending you an email now."
+            in_stock = "<@!" + userID + "> This is in stock now! [Link here](" + url + ")."
             msg = {"content": in_stock}
             requests.post(webhookURL, data=msg) 
 
@@ -96,6 +97,11 @@ def check(url, site):
                 server.login(sender_email, password)
                 server.sendmail(sender_email, receiver_text, sms)
             spamCounter += 1
+
+        # Console Notification
+        if (console_notification == True):
+            msg = "In stock now! " + url
+            print(msg)
 
     # Out of stock (prints to terminal)
     else:

@@ -84,6 +84,9 @@ def check_item_in_stock(page_html, site):
     if (site == "playstation"):
         out_of_stock_divs = soup.findAll("link", {"href":"https://schema.org/OutOfStock"})
 
+    if (site == "gamestop"):
+        out_of_stock_divs = soup.findAll("div", {"data-ready-to-order": "false"})
+
     # FIXME: False positives occasionally.
     # if (site == "amazon"):
         # out_of_stock_divs = soup.find("div", {"id":"availability"})
@@ -130,16 +133,22 @@ def main():
     bestbuyPS5Digital = "https://www.bestbuy.com/site/sony-playstation-5-digital-edition-console/6430161.p?skuId=6430161"
     playstationDigital = "https://direct.playstation.com/en-us/consoles/console/playstation5-digital-edition-console.3006647"
     playstationDisk = "https://direct.playstation.com/en-us/consoles/console/playstation5-console.3006646"
-
+    gamestopDigital = "https://www.gamestop.com/consoles-hardware/playstation-5/consoles/products/sony-playstation-5-digital-edition-console/11108141.html?bt=true"
+    gamestopDisk = "https://www.gamestop.com/consoles-hardware/playstation-5/consoles/products/sony-playstation-5-console/11108140.html?bt=true"
+ 
     while True:
         check(bestbuyPS5Disk, "bestbuy")
-        time.sleep(15)
+        time.sleep(10)
         check(bestbuyPS5Digital, "bestbuy")
-        time.sleep(15)
+        time.sleep(10)
         check(playstationDigital, "playstation")
-        time.sleep(15)
+        time.sleep(10)
         check(playstationDisk, "playstation")
-        time.sleep(15)
+        time.sleep(10)
+        check(gamestopDigital, "gamestop")
+        time.sleep(10)
+        check(gamestopDisk, "gamestop")
+        time.sleep(10)
 
 main()
 

@@ -1,5 +1,5 @@
 # StockNotify
-PS5 restock notifier via Discord webhook and BeautifulSoup.
+Restock notifier via Discord webhook and BeautifulSoup.
 
 ## Pre-Requisites:
 Requests  
@@ -19,7 +19,7 @@ spamLimit default set to 5. If item is in stock for prolonged periods you could 
 Run program and enter email sender password. If you're just doing Discord notification simply press "enter".  
 
 ## Current Features:
-Currently scans Bestbuy.com (digital and disk), PlayStation Direct (digital and disk) and Gamestop (digital and disk).   
+Currently scans Bestbuy.com, PlayStation Direct and Gamestop. (Example code tracks PS5s from all 3 websites).
 Will alert via Discord notification, email, text message, or console output.
 
 ## Features To Come:

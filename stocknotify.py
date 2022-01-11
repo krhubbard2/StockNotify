@@ -132,12 +132,12 @@ def main():
  
     while True:
         # check(URL, website)
-        check(bestbuyPS5Disk, websites(0))
-        check(bestbuyPS5Digital, websites(0))
-        check(playstationDigital, websites(1))
-        check(playstationDisk, websites(1))
-        check(gamestopDigital, websites(2))
-        check(gamestopDisk, websites(2))
+        check(bestbuyPS5Disk, websites[0])
+        check(bestbuyPS5Digital, websites[0])
+        check(playstationDigital, websites[1])
+        check(playstationDisk, websites[1])
+        check(gamestopDigital, websites[2])
+        check(gamestopDisk, websites[2])
 
         # To reduce unnecessary spamming of websites, ensure a sleep time of 60 seconds.
         time.sleep(60)

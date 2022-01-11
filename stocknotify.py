@@ -1,9 +1,9 @@
 # stocknotify.py
 # Kelby Hubbard
 # Started: 2022-01-06
-# Updated: 2022-01-09
+# Updated: 2022-01-10
 
-# Notify a user via Discord, email, or sms text of potential PS5 in stock using Discord webhook, html parsing and smtplib. Currently works with Bestbuy & Playstation direct.
+# Notify a user via Discord, email, or sms text of potential item in stock using Discord webhook, html parsing and smtplib. Currently works with Bestbuy, Playstation direct and Gamestop.
 
 import requests
 from bs4 import BeautifulSoup
@@ -33,7 +33,7 @@ spamCounter = 0
 
 # Sends Discord notification
 def discord_notify(url):
-    message = "<@!" + userID + "> This is in stock now! [Link here](" + url + ")."
+    message = "<@!" + userID + "> Item in stock now! [Link here](" + url + ")."
     msg = {"content": message}
     requests.post(webhookURL, data=msg) 
 
@@ -43,7 +43,7 @@ def email_notify(url):
     message = """\
     Subject: StockNotify
 
-    PS5 In Stock Now! """ + url
+    Item in stock now! """ + url
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(sender_email, password)
@@ -57,7 +57,7 @@ def text_notify(url):
     msg['From'] = sender_email
     msg['To'] = receiver_text
     msg['Subject'] = "StockNotify\n"
-    body = "PS5 In Stock Now! " + url
+    body = "Item in stock now! " + url
     msg.attach(MIMEText(body, 'plain'))
 
     sms = msg.as_string()
@@ -87,15 +87,6 @@ def check_item_in_stock(page_html, site):
     if (site == "gamestop"):
         out_of_stock_divs = soup.findAll("div", {"data-ready-to-order": "false"})
 
-    # FIXME: False positives occasionally.
-    # if (site == "amazon"):
-        # out_of_stock_divs = soup.find("div", {"id":"availability"})
-
-    # FIXME: Doesn't work. Uses JS to show availability?
-    # if (site == "walmart"):
-    #     out_of_stock_divs = soup.findAll("Out of stock")
-    #     print(out_of_stock_divs)
-        
     return len(out_of_stock_divs) == 0
 
 def check(url, site):
@@ -135,22 +126,20 @@ def main():
     playstationDisk = "https://direct.playstation.com/en-us/consoles/console/playstation5-console.3006646"
     gamestopDigital = "https://www.gamestop.com/consoles-hardware/playstation-5/consoles/products/sony-playstation-5-digital-edition-console/11108141.html?bt=true"
     gamestopDisk = "https://www.gamestop.com/consoles-hardware/playstation-5/consoles/products/sony-playstation-5-console/11108140.html?bt=true"
+
+    # Currently working websites (used to tell check function which site you're tracking)
+    websites = ["bestbuy", "playstation", "gamestop"]
  
     while True:
-        check(bestbuyPS5Disk, "bestbuy")
-        time.sleep(10)
-        check(bestbuyPS5Digital, "bestbuy")
-        time.sleep(10)
-        check(playstationDigital, "playstation")
-        time.sleep(10)
-        check(playstationDisk, "playstation")
-        time.sleep(10)
-        check(gamestopDigital, "gamestop")
-        time.sleep(10)
-        check(gamestopDisk, "gamestop")
-        time.sleep(10)
+        # check(URL, website)
+        check(bestbuyPS5Disk, websites(0))
+        check(bestbuyPS5Digital, websites(0))
+        check(playstationDigital, websites(1))
+        check(playstationDisk, websites(1))
+        check(gamestopDigital, websites(2))
+        check(gamestopDisk, websites(2))
+
+        # To reduce unnecessary spamming of websites, ensure a sleep time of 60 seconds.
+        time.sleep(60)
 
 main()
-
-# walmartPS5Disk = "https://www.walmart.com/ip/PlayStation-5-Console/363472942?irgwc=1&sourceid=imp_QbA3ga39axyIUPkzIH1IWSTvUkG1aiTAEXYo3E0&veh=aff&wmlspartner=imp_1943169&clickid=QbA3ga39axyIUPkzIH1IWSTvUkG1aiTAEXYo3E0&sharedid=tomsguide-us&affiliates_ad_id=565706&campaign_id=9383"
-# walmartPS5Digital = "https://www.walmart.com/ip/Sony-PlayStation-5-Digital-Edition/493824815?irgwc=1&sourceid=imp_QbA3ga39axyIUPkzIH1IWSTvUkG1aiTAEXYo3E0&veh=aff&wmlspartner=imp_1943169&clickid=QbA3ga39axyIUPkzIH1IWSTvUkG1aiTAEXYo3E0&sharedid=tomsguide-us&affiliates_ad_id=565706&campaign_id=9383"
